@@ -1,0 +1,14 @@
+name: DiagnosticApp
+options:
+  bundleIdPrefix: com.security
+targets:
+  DiagnosticApp:
+    type: application
+    platform: iOS
+    deploymentTarget: "15.0"
+    sources: 
+      - path: Sources
+    settings:
+      CODE_SIGNING_ALLOWED: "NO"
+    info:
+      path: Sources/Info.plist

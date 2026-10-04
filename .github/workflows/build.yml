@@ -1,0 +1,44 @@
+name: Build Unsigned iOS App
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Install XcodeGen
+      run: brew install xcodegen
+        
+    - name: Generate Xcode Project
+      run: xcodegen generate
+        
+    - name: Build Xcode Project
+      run: |
+        xcodebuild clean build \
+          -project DiagnosticApp.xcodeproj \
+          -scheme DiagnosticApp \
+          -configuration Release \
+          -sdk iphoneos \
+          -derivedDataPath build \
+          CODE_SIGNING_ALLOWED=NO \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGN_IDENTITY=""
+            
+    - name: Package to IPA
+      run: |
+        mkdir -p Payload
+        cp -r build/Build/Products/Release-iphoneos/DiagnosticApp.app Payload/
+        zip -r DiagnosticApp.ipa Payload
+          
+    - name: Upload IPA Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: DiagnosticApp-Unsigned
+        path: DiagnosticApp.ipa

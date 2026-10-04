@@ -11,7 +11,6 @@ class ViewController: UIViewController {
     }
     
     private func setupUI() {
-        // Ép nền màu trắng để tránh lỗi đen xì ở Dark Mode
         view.backgroundColor = .white
         
         let testButton = UIButton(type: .system)
@@ -76,12 +75,15 @@ class ViewController: UIViewController {
     private func verifyPrivilegesStub() -> Bool { return true }
 
     private func testUIOverlay() -> Bool {
-        guard let windowScene = UIApplication.shared.connectedScenes
-                .filter({ $0.activationState == .foregroundActive })
-                .first as? UIWindowScene else { return false }
+        // Do đã gỡ SceneDelegate, fallback tạo Window thuần túy
+        let overlay: UIWindow
+        if #available(iOS 13.0, *), let windowScene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+            overlay = UIWindow(windowScene: windowScene)
+            overlay.frame = windowScene.coordinateSpace.bounds
+        } else {
+            overlay = UIWindow(frame: UIScreen.main.bounds)
+        }
         
-        let overlay = UIWindow(windowScene: windowScene)
-        overlay.frame = windowScene.coordinateSpace.bounds
         overlay.windowLevel = UIWindow.Level.alert + 1
         overlay.backgroundColor = UIColor.black.withAlphaComponent(0.6)
         
